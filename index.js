@@ -6,44 +6,42 @@ const path = require('path');
 
 function requestController(req, res) {
 
-    let archivo;
+  let vista;
 
-    if (req.url === '/') {
-        archivo = 'main.html';
-    } 
-    else if (req.url === '/nosotros') {
-        archivo = 'nosotros.html';
-    } 
-    else {
-        res.writeHead(404, {
-            'Content-Type': 'text/html; charset=utf-8'
-        });
+  if (req.url === '/') {
+    vista = 'index.html';
+  } 
+  else if (req.url === '/nosotros') {
+    vista = 'nosotros.html';
+  } 
+  else {
+    res.writeHead(404, {
+      'Content-Type': 'text/html; charset=utf-8'
+    });
 
-        return res.end(`
-            <h1>Error 404</h1>
-            <p>Página no encontrada.</p>
-            <a href="/">Volver al inicio</a>
-        `);
+    return res.end('<h1>Página no encontrada</h1>');
+  }
+
+  const ruta = path.join(__dirname, 'views', vista);
+
+  fs.readFile(ruta, (error, data) => {
+
+    if (error) {
+      console.log(error);
+
+      res.writeHead(500, {
+        'Content-Type': 'text/html; charset=utf-8'
+      });
+
+      return res.end('Error al cargar la vista');
     }
 
-    const ruta = path.join(__dirname, 'views', archivo);
-
-    fs.readFile(ruta, (error, contenido) => {
-
-        if (error) {
-            res.writeHead(500, {
-                'Content-Type': 'text/html; charset=utf-8'
-            });
-
-            return res.end('Error al cargar la vista');
-        }
-
-        res.writeHead(200, {
-            'Content-Type': 'text/html; charset=utf-8'
-        });
-
-        res.end(contenido);
+    res.writeHead(200, {
+      'Content-Type': 'text/html; charset=utf-8'
     });
+
+    res.end(data);
+  });
 }
 
 const server = http.createServer(requestController);
@@ -51,5 +49,5 @@ const server = http.createServer(requestController);
 const PORT = process.env.PORT || 4000;
 
 server.listen(PORT, () => {
-    console.log('Aplicacion corriendo en: ' + PORT);
+  console.log('Aplicacion corriendo en: ' + PORT);
 });
